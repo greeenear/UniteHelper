@@ -7,18 +7,18 @@ using UnityEngine;
 public class ObjectPool<T> where T: UnityEngine.Component
 {
     public event Func<T> OnCreateRequest;
-    private Stack<T> pull;
+    private Stack<T> pool;
 
     public ObjectPool(int startSize)
     {
-        pull = new Stack<T>(startSize);
+        pool = new Stack<T>(startSize);
     }
 
     public T Get()
     {
-        if (pull.Count > 0)
+        if (pool.Count > 0)
         {
-            var curObject = pull.Pop();
+            var curObject = pool.Pop();
             curObject.gameObject.SetActive(true);
             return curObject;
         }
@@ -34,7 +34,7 @@ public class ObjectPool<T> where T: UnityEngine.Component
             return;
         }
 
-        pull.Push(returnedObject);
+        pool.Push(returnedObject);
         returnedObject.gameObject.SetActive(false);
     }
 
@@ -42,17 +42,17 @@ public class ObjectPool<T> where T: UnityEngine.Component
     {
         for (int i = 0; i < count; i++)
         {
-            if (pull.Count <= 0)
+            if (pool.Count <= 0)
             {
                 return;
             }
 
-            GameObject.Destroy(pull.Pop());
+            GameObject.Destroy(pool.Pop().gameObject);
         }
     }
 
     public int GetSize()
     {
-        return pull.Count;
+        return pool.Count;
     }
 }
